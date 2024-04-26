@@ -68,6 +68,18 @@ export const Answer = ({
         setFeedbackState(currentFeedbackState)
     }, [appStateContext?.state.feedbackState, feedbackState, answer.message_id]);
 
+    const speak = () => {
+        const text = document.querySelectorAll("[class^='_answerText']")[document.querySelectorAll("[class^='_answerText']").length - 1].textContent;
+        if (!text) return; // Check if text is empty
+        const synth = window.speechSynthesis;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'de-DE';
+        const voice = window.speechSynthesis.getVoices().find((voice) => voice.name === 'Google Deutsch') || synth.getVoices().find((voice) => voice.name === 'Microsoft Stefan - German (Germany)');
+        utterance.voice = voice || null; // Add null check before assigning the voice
+        utterance.rate = 1.1;
+        synth.speak(utterance);
+    };
+
     const createCitationFilepath = (citation: Citation, index: number, truncate: boolean = false) => {
         let citationFilename = "";
 
@@ -209,6 +221,7 @@ export const Answer = ({
                                 className={styles.answerText}
                                 components={components}
                             />
+                            <button onClick={speak}>Vorlesen</button>
                         </Stack.Item>
                         <Stack.Item className={styles.answerHeader}>
                             {FEEDBACK_ENABLED && answer.message_id !== undefined && <Stack horizontal horizontalAlign="space-between">
